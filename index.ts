@@ -8,7 +8,7 @@ import extract from "extract-zip";
 import puppeteer from "puppeteer";
 
 const logger = (...args: string[]) => {
-  console.log("[icomoon-cli]", ...args);
+  console.log("[svg-font]", ...args);
 };
 
 const getAbsolutePath = (inputPath: string) => {
@@ -58,6 +58,7 @@ const checkDuplicateName = (
     return path.basename(icon).replace(path.extname(icon), "");
   });
   const duplicates: { name: any; index: any }[] = [];
+  console.log('sdfsdf', selectionPath)
   const selection = fs.readJSONSync(selectionPath);
   selection.icons.forEach(({ properties }, index) => {
     if (iconNames.includes(properties.name)) {
@@ -113,6 +114,7 @@ async function pipeline(options: Pipeline) {
       },
       forceOverride
     );
+      console.log('outputDir',outputDir)
     await fs.remove(outputDir);
     await fs.ensureDir(outputDir);
 
@@ -137,7 +139,9 @@ async function pipeline(options: Pipeline) {
     await importInput.uploadFile(absoluteSelectionPath);
     await page.waitForSelector(PAGE.OVERLAY_CONFIRM, { visible: true });
     await page.click(PAGE.OVERLAY_CONFIRM);
+    console.log('selectionPath', selectionPath)
     const selection = fs.readJSONSync(selectionPath);
+    console.log('lets selection:', selection)
     if (selection.icons.length === 0) {
       logger("Selection icons is empty, going to create an empty set");
       await page.click(PAGE.MAIN_MENU_BUTTON);
