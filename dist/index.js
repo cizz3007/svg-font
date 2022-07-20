@@ -1,34 +1,4 @@
-import path from 'path';
-import fs from 'fs-extra';
-import extract from 'extract-zip';
-import puppeteer from 'puppeteer';
-
-const wait = (time) => new Promise((resolve) => setTimeout(resolve, time));
-
-const DEFAULT_TIMEOUT = 60000;
-const PAGE = {
-    IMPORT_CONFIG_BUTTON: ".file.unit",
-    IMPORT_SELECTION_INPUT: '.file.unit input[type="file"]',
-    OVERLAY_CONFIRM: ".overlay button.mrl",
-    NEW_SET_BUTTON: ".menuList1 button",
-    MAIN_MENU_BUTTON: ".bar-top button .icon-menu",
-    MENU_BUTTON: "h1 button .icon-menu",
-    MENU: ".menuList2.menuList3",
-    ICON_INPUT: '.menuList2.menuList3 .file input[type="file"]',
-    FIRST_ICON_BOX: "#set0 .miBox:not(.mi-selected)",
-    REMOVE_SET_BUTTON: ".menuList2.menuList3 li:last-child button",
-    SELECT_ALL_BUTTON: 'button[ng-click="selectAllNone($index, true)"]',
-    GENERATE_LINK: 'a[href="#/select/font"]',
-    GLYPH_SET: "#glyphSet0",
-    GLYPH_NAME: ".glyphName",
-    DOWNLOAD_BUTTON: ".btn4",
-};
-const __dirname = path.resolve();
-const DEFAULT_OPTIONS = {
-    outputDir: path.join(__dirname, "output"),
-};
-
-var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -37,19 +7,14 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const logger = (...args) => {
-    console.log("[svg-font]", ...args);
-};
-const getAbsolutePath = (inputPath) => {
-    let absoluteSelectionPath = inputPath;
-    if (!path.isAbsolute(inputPath)) {
-        if (!process.env.PWD) {
-            process.env.PWD = process.cwd();
-        }
-        absoluteSelectionPath = path.resolve(process.env.PWD, inputPath);
-    }
-    return absoluteSelectionPath;
-};
+import { wait } from "./utils/wait";
+import { DEFAULT_OPTIONS, DEFAULT_TIMEOUT, PAGE } from "./const";
+import fs from "fs-extra";
+import path from "path";
+import extract from "extract-zip";
+import puppeteer from "puppeteer";
+import { logger } from "./utils/log";
+import { getAbsolutePath } from "./functions/getAbsolutePath";
 const checkDownload = (dest) => new Promise((resolve, reject) => {
     const interval = 1000;
     let downloadSize = 0;
@@ -82,7 +47,7 @@ const checkDuplicateName = ({ selectionPath, icons, names }, forceOverride) => {
         return path.basename(icon).replace(path.extname(icon), "");
     });
     const duplicates = [];
-    console.log('sdfsdf', selectionPath);
+    console.log("sdfsdf", selectionPath);
     const selection = fs.readJSONSync(selectionPath);
     selection.icons.forEach(({ properties }, index) => {
         if (iconNames.includes(properties.name)) {
@@ -123,7 +88,7 @@ function pipeline(options) {
                 icons,
                 names,
             }, forceOverride);
-            console.log('outputDir', outputDir);
+            console.log("outputDir", outputDir);
             yield fs.remove(outputDir);
             yield fs.ensureDir(outputDir);
             const browser = yield puppeteer.launch({ headless: !visible });
@@ -143,9 +108,9 @@ function pipeline(options) {
             yield importInput.uploadFile(absoluteSelectionPath);
             yield page.waitForSelector(PAGE.OVERLAY_CONFIRM, { visible: true });
             yield page.click(PAGE.OVERLAY_CONFIRM);
-            console.log('selectionPath', selectionPath);
+            console.log("selectionPath", selectionPath);
             const selection = fs.readJSONSync(selectionPath);
-            console.log('lets selection:', selection);
+            console.log("lets selection:", selection);
             if (selection.icons.length === 0) {
                 logger("Selection icons is empty, going to create an empty set");
                 yield page.click(PAGE.MAIN_MENU_BUTTON);
@@ -223,5 +188,5 @@ function pipeline(options) {
         }
     });
 }
-
-export { pipeline as default };
+export default pipeline;
+//# sourceMappingURL=index.js.map

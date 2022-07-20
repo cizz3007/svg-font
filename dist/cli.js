@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 import yargs from "yargs";
-import pipeline from "./index.js";
+import pipeline from "./index";
 import { hideBin } from "yargs/helpers";
-console.log(pipeline);
 const argv = yargs(hideBin(process.argv))
     .option("s", {
     alias: "selection",
@@ -39,7 +38,6 @@ const argv = yargs(hideBin(process.argv))
     default: "svg",
     describe: "어떤 이미지 포맷을 변환할지 설정할 수 있습니다.",
 }).argv;
-console.log(argv);
 pipeline({
     selectionPath: argv.s,
     icons: argv.i.split(","),
