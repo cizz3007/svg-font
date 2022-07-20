@@ -1,7 +1,7 @@
 import type { Page } from "puppeteer";
 import type { Pipeline } from "./src/type/pipeline.type";
 import { wait } from "./src/utils/wait.js";
-import { DEFAULT_OPTIONS, DEFAULT_TIMEOUT, PAGE } from "@/const/index.js";
+import { DEFAULT_OPTIONS, DEFAULT_TIMEOUT, PAGE } from "./src/const/index.js";
 import fs from "fs-extra";
 import path from "path";
 import extract from "extract-zip";
