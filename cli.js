@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import yargs from "yargs";
-import pipeline from "./index";
+import pipeline from "./index.js";
 import { hideBin } from "yargs/helpers";
 const argv = yargs(hideBin(process.argv))
     .option("s", {

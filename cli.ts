@@ -3,7 +3,6 @@ import yargs from "yargs";
 import pipeline from "./index.js";
 import { hideBin } from "yargs/helpers";
 
-console.log(pipeline);
 //  --version --selection -s --icon -i 등등 받는 옵션을 설정할 수 있다.
 
 const argv = yargs(hideBin(process.argv))
@@ -43,7 +42,6 @@ const argv = yargs(hideBin(process.argv))
     describe: "어떤 이미지 포맷을 변환할지 설정할 수 있습니다.",
   }).argv;
 
-console.log(argv);
 pipeline({
   // @ts-ignore
   selectionPath: argv.s,

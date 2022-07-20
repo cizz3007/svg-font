@@ -1,26 +1,13 @@
 import type { Page } from "puppeteer";
-import type { Pipeline } from "./src/type/pipeline.type";
-import { wait } from "./src/utils/wait.js";
-import { DEFAULT_OPTIONS, DEFAULT_TIMEOUT, PAGE } from "./src/const/index.js";
+import type { Pipeline } from "@/type/pipeline.type";
+import { wait } from "@/utils/wait.js";
+import { DEFAULT_OPTIONS, DEFAULT_TIMEOUT, PAGE } from "@/const/index.js";
 import fs from "fs-extra";
 import path from "path";
 import extract from "extract-zip";
 import puppeteer from "puppeteer";
-
-const logger = (...args: string[]) => {
-  console.log("[svg-font]", ...args);
-};
-
-const getAbsolutePath = (inputPath: string) => {
-  let absoluteSelectionPath = inputPath;
-  if (!path.isAbsolute(inputPath)) {
-    if (!process.env.PWD) {
-      process.env.PWD = process.cwd();
-    }
-    absoluteSelectionPath = path.resolve(process.env.PWD, inputPath);
-  }
-  return absoluteSelectionPath;
-};
+import { logger } from "@/utils/log.js";
+import { getAbsolutePath } from "@/functions/getAbsolutePath.js";
 
 const checkDownload = (dest: any) =>
   new Promise<void>((resolve, reject) => {
@@ -58,7 +45,7 @@ const checkDuplicateName = (
     return path.basename(icon).replace(path.extname(icon), "");
   });
   const duplicates: { name: any; index: any }[] = [];
-  console.log('sdfsdf', selectionPath)
+  console.log("sdfsdf", selectionPath);
   const selection = fs.readJSONSync(selectionPath);
   selection.icons.forEach(({ properties }, index) => {
     if (iconNames.includes(properties.name)) {
@@ -114,7 +101,7 @@ async function pipeline(options: Pipeline) {
       },
       forceOverride
     );
-      console.log('outputDir',outputDir)
+    console.log("outputDir", outputDir);
     await fs.remove(outputDir);
     await fs.ensureDir(outputDir);
 
@@ -139,9 +126,9 @@ async function pipeline(options: Pipeline) {
     await importInput.uploadFile(absoluteSelectionPath);
     await page.waitForSelector(PAGE.OVERLAY_CONFIRM, { visible: true });
     await page.click(PAGE.OVERLAY_CONFIRM);
-    console.log('selectionPath', selectionPath)
+    console.log("selectionPath", selectionPath);
     const selection = fs.readJSONSync(selectionPath);
-    console.log('lets selection:', selection)
+    console.log("lets selection:", selection);
     if (selection.icons.length === 0) {
       logger("Selection icons is empty, going to create an empty set");
       await page.click(PAGE.MAIN_MENU_BUTTON);

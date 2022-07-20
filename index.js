@@ -7,14 +7,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { wait } from "./utils/wait";
-import { DEFAULT_OPTIONS, DEFAULT_TIMEOUT, PAGE } from "./const";
+import { wait } from "@/utils/wait.js";
+import { DEFAULT_OPTIONS, DEFAULT_TIMEOUT, PAGE } from "@/const/index.js";
 import fs from "fs-extra";
 import path from "path";
 import extract from "extract-zip";
 import puppeteer from "puppeteer";
-import { logger } from "./utils/log";
-import { getAbsolutePath } from "./functions/getAbsolutePath";
+import { logger } from "@/utils/log.js";
+import { getAbsolutePath } from "@/functions/getAbsolutePath.js";
 const checkDownload = (dest) => new Promise((resolve, reject) => {
     const interval = 1000;
     let downloadSize = 0;
