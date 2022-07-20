@@ -1,13 +1,13 @@
 import type { Page } from "puppeteer";
-import type { Pipeline } from "@/type/pipeline.type";
-import { wait } from "@/utils/wait.js";
+import type { Pipeline } from "./src/type/pipeline.type";
+import { wait } from "./src/utils/wait.js";
 import { DEFAULT_OPTIONS, DEFAULT_TIMEOUT, PAGE } from "@/const/index.js";
 import fs from "fs-extra";
 import path from "path";
 import extract from "extract-zip";
 import puppeteer from "puppeteer";
-import { logger } from "@/utils/log.js";
-import { getAbsolutePath } from "@/functions/getAbsolutePath.js";
+import { logger } from "./src/utils/log.js";
+import { getAbsolutePath } from "./src/functions/getAbsolutePath.js";
 
 const checkDownload = (dest: any) =>
   new Promise<void>((resolve, reject) => {
@@ -45,7 +45,6 @@ const checkDuplicateName = (
     return path.basename(icon).replace(path.extname(icon), "");
   });
   const duplicates: { name: any; index: any }[] = [];
-  console.log("sdfsdf", selectionPath);
   const selection = fs.readJSONSync(selectionPath);
   selection.icons.forEach(({ properties }, index) => {
     if (iconNames.includes(properties.name)) {

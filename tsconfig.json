@@ -13,7 +13,7 @@
     "outDir": "dist",
     "locale": "ko",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["src/*"]
     },
     "removeComments": true // comment 제거
   },
