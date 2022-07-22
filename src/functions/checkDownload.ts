@@ -1,5 +1,5 @@
 import fs from "fs-extra";
-import { DEFAULT_TIMEOUT } from "@/const";
+import { DEFAULT_TIMEOUT } from "../const/index.js";
 
 const checkDownload = (dest: any) =>
   new Promise<void>((resolve, reject) => {

@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import fs from "fs-extra";
-import { DEFAULT_TIMEOUT } from "@/const";
+import { DEFAULT_TIMEOUT } from "../const/index.js";
 const checkDownload = (dest) => new Promise((resolve, reject) => {
     const interval = 1000;
     let downloadSize = 0;

@@ -1,7 +1,7 @@
 import type { Page } from "puppeteer";
 import type { Pipeline } from "./src/type/pipeline.type";
 import { wait } from "./src/utils/wait.js";
-import { DEFAULT_OPTIONS, DEFAULT_TIMEOUT, PAGE } from "./src/const/index.js";
+import { DEFAULT_OPTIONS, PAGE } from "./src/const/index.js";
 import fs from "fs-extra";
 import path from "path";
 import extract from "extract-zip";
@@ -57,7 +57,7 @@ async function pipeline(options: Pipeline) {
       behavior: "allow",
       downloadPath: outputDir,
     });
-
+    // icomoon 사이트로
     await page.goto("https://icomoon.io/app/#/select");
     await page.waitForSelector(PAGE.IMPORT_CONFIG_BUTTON);
     logger("Dashboard is visible, going to upload config file");

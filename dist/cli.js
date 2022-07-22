@@ -31,7 +31,7 @@ const argv = yargs(hideBin(process.argv))
     .option("v", {
     alias: "visible",
     default: false,
-    describe: "run a GU I chrome instead of headless mode",
+    describe: "run a GUI chrome instead of headless mode",
 })
     .option("t", {
     alias: "imageType",
