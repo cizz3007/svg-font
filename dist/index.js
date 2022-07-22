@@ -8,62 +8,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { wait } from "./src/utils/wait.js";
-import { DEFAULT_OPTIONS, DEFAULT_TIMEOUT, PAGE } from "@/const/index.js";
+import { DEFAULT_OPTIONS, PAGE } from "./src/const/index.js";
 import fs from "fs-extra";
 import path from "path";
 import extract from "extract-zip";
 import puppeteer from "puppeteer";
 import { logger } from "./src/utils/log.js";
 import { getAbsolutePath } from "./src/functions/getAbsolutePath.js";
-const checkDownload = (dest) => new Promise((resolve, reject) => {
-    const interval = 1000;
-    let downloadSize = 0;
-    let timeCount = 0;
-    const timer = setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
-        timeCount += interval;
-        let exist = false;
-        yield fs.exists(dest, (result) => (exist = result));
-        if (!exist) {
-            return;
-        }
-        const stats = fs.statSync(dest);
-        if (stats.size > 0 && stats.size === downloadSize) {
-            clearInterval(timer);
-            resolve();
-        }
-        else {
-            downloadSize = stats.size;
-        }
-        if (timeCount > DEFAULT_TIMEOUT) {
-            reject("Timeout when download file, please check your network.");
-        }
-    }), interval);
-});
-const checkDuplicateName = ({ selectionPath, icons, names }, forceOverride) => {
-    const iconNames = icons.map((icon, index) => {
-        if (names[index]) {
-            return names[index];
-        }
-        return path.basename(icon).replace(path.extname(icon), "");
-    });
-    const duplicates = [];
-    const selection = fs.readJSONSync(selectionPath);
-    selection.icons.forEach(({ properties }, index) => {
-        if (iconNames.includes(properties.name)) {
-            duplicates.push({ name: properties.name, index });
-        }
-    });
-    if (!duplicates.length) {
-        return;
-    }
-    if (forceOverride) {
-        selection.icons = selection.icons.filter((icon, index) => !duplicates.some((d) => d.index === index));
-        fs.writeJSONSync(selectionPath, selection, { spaces: 2 });
-    }
-    else {
-        throw new Error(`Found duplicate icon names: ${duplicates.map((d) => d.name).join(",")}`);
-    }
-};
+import { checkDuplicateName } from "./src/functions/checkDuplicatedName.js";
+import { checkDownload } from "./src/functions/checkDownload.js";
 function pipeline(options) {
     return __awaiter(this, void 0, void 0, function* () {
         try {

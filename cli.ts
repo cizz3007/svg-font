@@ -46,9 +46,9 @@ pipeline({
   // @ts-ignore
   selectionPath: argv.s,
   // @ts-ignore
-  icons: argv.i.split(","),
+  icons: argv.i.split(","), // 넘어온 argument들을 split해서 넘김
   // @ts-ignore
-  names: argv.n.split(","),
+  names: argv.n.split(","), // 넘어온 argument들을 split해서 넘김
   // @ts-ignore
   outputDir: argv.o,
   // @ts-ignore
