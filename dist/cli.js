@@ -8,6 +8,11 @@ const argv = yargs(hideBin(process.argv))
     demand: true,
     describe: "selection 파일이 위치하는 경로",
 })
+    .option("d", {
+    alias: "directory",
+    demand: false,
+    describe: "svg 파일들이 위치한 폴더를 입력해 주세요.",
+})
     .option("i", {
     alias: "icons",
     describe: "불러와져야 하는 아이콘들입니다. 쉼표로 구분 나눠집니다.",
@@ -45,5 +50,6 @@ pipeline({
     outputDir: argv.o,
     forceOverride: argv.f,
     visible: argv.v,
+    directory: argv.d,
 });
 //# sourceMappingURL=cli.js.map

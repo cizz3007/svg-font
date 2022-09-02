@@ -20,7 +20,8 @@ import { checkDownload } from "./src/functions/checkDownload.js";
 function pipeline(options) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { icons, names = [], selectionPath, forceOverride = false, whenFinished, visible = false, } = options;
+            const { icons, names = [], selectionPath, forceOverride = false, whenFinished, visible = false, directory, } = options;
+            console.log("directory : ", directory);
             const outputDir = options.outputDir
                 ? getAbsolutePath(options.outputDir)
                 : DEFAULT_OPTIONS.outputDir;

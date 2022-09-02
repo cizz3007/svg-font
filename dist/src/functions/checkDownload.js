@@ -15,22 +15,24 @@ const checkDownload = (dest) => new Promise((resolve, reject) => {
     let timeCount = 0;
     const timer = setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
         timeCount += interval;
-        let exist = false;
-        yield fs.exists(dest, (result) => (exist = result));
-        if (!exist) {
-            return;
-        }
-        const stats = fs.statSync(dest);
-        if (stats.size > 0 && stats.size === downloadSize) {
-            clearInterval(timer);
-            resolve();
-        }
-        else {
-            downloadSize = stats.size;
-        }
-        if (timeCount > DEFAULT_TIMEOUT) {
-            reject("Timeout when download file, please check your network.");
-        }
+        yield fs.access(dest, (err) => {
+            if (err) {
+                return;
+            }
+            else {
+                const stats = fs.statSync(dest);
+                if (stats.size > 0 && stats.size === downloadSize) {
+                    clearInterval(timer);
+                    resolve();
+                }
+                else {
+                    downloadSize = stats.size;
+                }
+                if (timeCount > DEFAULT_TIMEOUT) {
+                    reject("Timeout when download file, please check your network.");
+                }
+            }
+        });
     }), interval);
 });
 export { checkDownload };

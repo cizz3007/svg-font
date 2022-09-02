@@ -2,10 +2,10 @@
   "name": "font-icon-generator",
   "version": "0.0.1",
   "description": "svg이미지를 아이콘으로 포맷변경",
-  "main": "index.ts",
+  "main": "./dist/index.js",
   "type": "module",
   "bin": {
-    "make-icon": "cli.js"
+    "make-icon": "./dist/cli.js"
   },
   "scripts": {
     "build": "tsc && resolve-tspaths",
@@ -21,8 +21,7 @@
     "icomoon"
   ],
   "files": [
-    "dist/esm",
-    "dist/cjs"
+    "cli"
   ],
   "funding": {
     "type": "opencollective",

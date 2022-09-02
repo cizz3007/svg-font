@@ -20,8 +20,9 @@ async function pipeline(options: Pipeline) {
       forceOverride = false,
       whenFinished,
       visible = false,
+      directory,
     } = options;
-
+    console.log("directory : ", directory);
     const outputDir = options.outputDir
       ? getAbsolutePath(options.outputDir)
       : DEFAULT_OPTIONS.outputDir;

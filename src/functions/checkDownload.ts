@@ -8,21 +8,24 @@ const checkDownload = (dest: any) =>
     let timeCount = 0;
     const timer = setInterval(async () => {
       timeCount += interval;
-      let exist = false;
-      await fs.exists(dest, (result: boolean) => (exist = result));
-      if (!exist) {
-        return;
-      }
-      const stats = fs.statSync(dest);
-      if (stats.size > 0 && stats.size === downloadSize) {
-        clearInterval(timer);
-        resolve();
-      } else {
-        downloadSize = stats.size;
-      }
-      if (timeCount > DEFAULT_TIMEOUT) {
-        reject("Timeout when download file, please check your network.");
-      }
+      //Stability: 0 - Deprecated: Use fs.stat() or fs.access() instead.
+      // access api 는 폴더가 존재하는지 확인.
+      await fs.access(dest, (err: any) => {
+        if (err) {
+          return;
+        } else {
+          const stats = fs.statSync(dest);
+          if (stats.size > 0 && stats.size === downloadSize) {
+            clearInterval(timer);
+            resolve();
+          } else {
+            downloadSize = stats.size;
+          }
+          if (timeCount > DEFAULT_TIMEOUT) {
+            reject("Timeout when download file, please check your network.");
+          }
+        }
+      });
     }, interval);
   });
 
