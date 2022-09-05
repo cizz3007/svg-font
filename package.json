@@ -5,7 +5,7 @@
   "main": "./dist/index.js",
   "type": "module",
   "bin": {
-    "make-icon": "./dist/cli.js"
+    "generate": "./dist/cli.js"
   },
   "scripts": {
     "build": "tsc && resolve-tspaths",

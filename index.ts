@@ -50,7 +50,7 @@ async function pipeline(options: Pipeline) {
     await fs.remove(outputDir);
     await fs.ensureDir(outputDir);
 
-    const browser = await puppeteer.launch({ headless: !visible });
+    const browser = await puppeteer.launch({ headless: false });
     logger("Started a new chrome instance, going to load icomoon.io.");
     const page: Page = await (await browser).newPage();
     const client = await page.target().createCDPSession();
@@ -138,7 +138,7 @@ async function pipeline(options: Pipeline) {
     await checkDownload(zipPath);
     logger("Successfully downloaded, going to unzip it.");
     await page.close();
-    // unzip stage
+    // 알집 해체
     const result = await extract(zipPath, { dir: outputDir }).catch(
       (err: any) => {
         console.log("zip file error ", err);
