@@ -7,12 +7,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { wait } from "./src/utils/wait.js";
-import { DEFAULT_OPTIONS, PAGE } from "./src/const/index.js";
 import fs from "fs-extra";
 import path from "path";
 import extract from "extract-zip";
 import puppeteer from "puppeteer";
+import { wait } from "./src/utils/wait.js";
+import { DEFAULT_OPTIONS, PAGE } from "./src/const/index.js";
 import { logger } from "./src/utils/log.js";
 import { getAbsolutePath } from "./src/functions/getAbsolutePath.js";
 import { checkDuplicateName } from "./src/functions/checkDuplicatedName.js";
@@ -20,8 +20,10 @@ import { checkDownload } from "./src/functions/checkDownload.js";
 function pipeline(options) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { icons, names = [], selectionPath, forceOverride = false, whenFinished, visible = false, directory, } = options;
+            const { icons = [], names = [], selectionPath, forceOverride = false, whenFinished, visible = false, directory, } = options;
             console.log("directory : ", directory);
+            console.log('icons: ', icons);
+            console.log('names: ', names);
             const outputDir = options.outputDir
                 ? getAbsolutePath(options.outputDir)
                 : DEFAULT_OPTIONS.outputDir;
@@ -61,9 +63,7 @@ function pipeline(options) {
             yield importInput.uploadFile(absoluteSelectionPath);
             yield page.waitForSelector(PAGE.OVERLAY_CONFIRM, { visible: true });
             yield page.click(PAGE.OVERLAY_CONFIRM);
-            console.log("selectionPath", selectionPath);
             const selection = fs.readJSONSync(selectionPath);
-            console.log("lets selection:", selection);
             if (selection.icons.length === 0) {
                 logger("Selection icons is empty, going to create an empty set");
                 yield page.click(PAGE.MAIN_MENU_BUTTON);
@@ -127,7 +127,8 @@ function pipeline(options) {
                 return false;
             });
             if (!result) {
-                console.log("알집 해제 실패");
+                console.log(result);
+                console.log("알집 해제 실패: ", result);
                 return;
             }
             yield fs.remove(zipPath);
