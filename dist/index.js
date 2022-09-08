@@ -7,35 +7,38 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import fs from "fs-extra";
-import path from "path";
-import extract from "extract-zip";
-import puppeteer from "puppeteer";
-import { wait } from "./src/utils/wait.js";
-import { DEFAULT_OPTIONS, PAGE } from "./src/const/index.js";
-import { logger } from "./src/utils/log.js";
-import { getAbsolutePath } from "./src/functions/getAbsolutePath.js";
-import { checkDuplicateName } from "./src/functions/checkDuplicatedName.js";
-import { checkDownload } from "./src/functions/checkDownload.js";
-function pipeline(options) {
+import fs from 'fs-extra';
+import path from 'path';
+import extract from 'extract-zip';
+import puppeteer from 'puppeteer';
+import { wait } from './src/utils/wait.js';
+import { DEFAULT_OPTIONS, PAGE } from './src/const/index.js';
+import { logger } from './src/utils/log.js';
+import { getAbsolutePath } from './src/functions/getAbsolutePath.js';
+import { checkDuplicateName } from './src/functions/checkDuplicatedName.js';
+import { checkDownload } from './src/functions/checkDownload.js';
+import { getFileRecursively } from './src/functions/getFileRecursively.js';
+function pipeline({ icons = [], names = [], selectionPath, forceOverride = false, whenFinished, visible = false, directory, outputDir: outputDirectory, }) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { icons = [], names = [], selectionPath, forceOverride = false, whenFinished, visible = false, directory, } = options;
-            console.log("directory : ", directory);
+            console.log('directory : ', directory);
             console.log('icons: ', icons);
             console.log('names: ', names);
-            const outputDir = options.outputDir
-                ? getAbsolutePath(options.outputDir)
-                : DEFAULT_OPTIONS.outputDir;
-            logger("Preparing...");
+            const outputDir = outputDirectory ? getAbsolutePath(outputDirectory) : DEFAULT_OPTIONS.outputDir;
+            logger('폰트 생성을 시작합니다.');
+            yield getFileRecursively(directory, (err, res) => {
+                if (res.length) {
+                    icons = res;
+                }
+            });
             if (!icons || !icons.length) {
                 if (whenFinished) {
                     whenFinished({ outputDir });
                 }
-                return logger("No new icons found.");
+                return logger('No new icons found.');
             }
             if (!selectionPath) {
-                throw new Error("Please config a valid selection file path.");
+                throw new Error('selection.json File의 경로를 정확히 입력해 주세요');
             }
             let absoluteSelectionPath = getAbsolutePath(selectionPath);
             checkDuplicateName({
@@ -43,20 +46,20 @@ function pipeline(options) {
                 icons,
                 names,
             }, forceOverride);
-            console.log("outputDir", outputDir);
+            console.log('outputDir', outputDir);
             yield fs.remove(outputDir);
             yield fs.ensureDir(outputDir);
             const browser = yield puppeteer.launch({ headless: !visible });
-            logger("Started a new chrome instance, going to load icomoon.io.");
+            logger('크롬 브라우저를 시작합니다.');
             const page = yield (yield browser).newPage();
             const client = yield page.target().createCDPSession();
-            yield client.send("Page.setDownloadBehavior", {
-                behavior: "allow",
+            yield client.send('Page.setDownloadBehavior', {
+                behavior: 'allow',
                 downloadPath: outputDir,
             });
-            yield page.goto("https://icomoon.io/app/#/select");
+            yield page.goto('https://icomoon.io/app/#/select');
             yield page.waitForSelector(PAGE.IMPORT_CONFIG_BUTTON);
-            logger("Dashboard is visible, going to upload config file");
+            logger('config file을 업로드합니다.');
             yield page.click(PAGE.MENU_BUTTON);
             yield page.click(PAGE.REMOVE_SET_BUTTON);
             const importInput = yield page.waitForSelector(PAGE.IMPORT_SELECTION_INPUT);
@@ -65,35 +68,35 @@ function pipeline(options) {
             yield page.click(PAGE.OVERLAY_CONFIRM);
             const selection = fs.readJSONSync(selectionPath);
             if (selection.icons.length === 0) {
-                logger("Selection icons is empty, going to create an empty set");
+                logger('Selection icons is empty, going to create an empty set');
                 yield page.click(PAGE.MAIN_MENU_BUTTON);
                 yield page.waitForSelector(PAGE.NEW_SET_BUTTON, { visible: true });
                 yield page.click(PAGE.NEW_SET_BUTTON);
             }
-            logger("Uploaded config, going to upload new icon files");
+            logger('Uploaded config, going to upload new icon files');
             yield page.click(PAGE.MENU_BUTTON);
             const iconInput = yield page.waitForSelector(PAGE.ICON_INPUT);
             const iconPaths = icons.map(getAbsolutePath);
             yield iconInput.uploadFile(...iconPaths);
             yield page.waitForSelector(PAGE.FIRST_ICON_BOX);
             yield page.click(PAGE.SELECT_ALL_BUTTON);
-            logger("Uploaded and selected all new icons");
+            logger('Uploaded and selected all new icons');
             yield page.click(PAGE.GENERATE_LINK);
             yield page.waitForSelector(PAGE.GLYPH_SET);
             if (names.length) {
-                logger("Changed names of icons");
-                yield wait(1000);
+                logger('Changed names of icons');
+                yield wait(1200);
                 yield page.evaluate((names) => {
-                    const request = indexedDB.open("IDBWrapper-storage", 1);
+                    const request = indexedDB.open('IDBWrapper-storage', 1);
                     request.onsuccess = function () {
                         const db = request.result;
-                        const tx = db.transaction("storage", "readwrite");
-                        const store = tx.objectStore("storage");
+                        const tx = db.transaction('storage', 'readwrite');
+                        const store = tx.objectStore('storage');
                         const keys = store.getAllKeys();
                         keys.onsuccess = function () {
                             let timestamp;
                             keys.result.forEach(function (key) {
-                                if (typeof key === "number") {
+                                if (typeof key === 'number') {
                                     timestamp = key;
                                 }
                             });
@@ -117,22 +120,22 @@ function pipeline(options) {
             const zipName = meta.majorVersion
                 ? `${meta.fontFamily}-v${meta.majorVersion}.${meta.minorVersion || 0}.zip`
                 : `${meta.fontFamily}.zip`;
-            logger(`Started to download ${zipName}`);
+            logger(`${zipName} 파일을 다운로드 합니다.`);
             const zipPath = path.join(outputDir, zipName);
             yield checkDownload(zipPath);
-            logger("Successfully downloaded, going to unzip it.");
+            logger('성공적으로 다운로드 했습니다. zip파일 압축을 해제합니다.');
             yield page.close();
             const result = yield extract(zipPath, { dir: outputDir }).catch((err) => {
-                console.log("zip file error ", err);
+                console.log('zip file 에러 ', err);
                 return false;
             });
             if (!result) {
                 console.log(result);
-                console.log("알집 해제 실패: ", result);
+                console.log('알집 해제 실패: ', result);
                 return;
             }
             yield fs.remove(zipPath);
-            logger(`Finished. The output directory is ${outputDir}.`);
+            logger(`생성 완료, 생성 경로는 ${outputDir} 입니다.`);
             if (whenFinished) {
                 whenFinished({ outputDir });
             }

@@ -10,6 +10,7 @@ import { logger } from './src/utils/log.js';
 import { getAbsolutePath } from './src/functions/getAbsolutePath.js';
 import { checkDuplicateName } from './src/functions/checkDuplicatedName.js';
 import { checkDownload } from './src/functions/checkDownload.js';
+import { getFileRecursively } from './src/functions/getFileRecursively.js';
 
 async function pipeline({
     icons = [],
@@ -30,6 +31,13 @@ async function pipeline({
         const outputDir = outputDirectory ? getAbsolutePath(outputDirectory) : DEFAULT_OPTIONS.outputDir;
         // prepare stage
         logger('폰트 생성을 시작합니다.');
+
+        await getFileRecursively(directory, (err, res: string[]) => {
+            if (res.length) {
+                icons = res;
+            }
+        });
+
         if (!icons || !icons.length) {
             // 완료 되었다면
             if (whenFinished) {
@@ -142,15 +150,10 @@ async function pipeline({
         logger('성공적으로 다운로드 했습니다. zip파일 압축을 해제합니다.');
         await page.close();
         // 알집 해체
-        const result = await extract(zipPath, { dir: outputDir }).catch((err: any) => {
+        await extract(zipPath, { dir: outputDir }).catch((err: any) => {
             console.log('zip file 에러 ', err);
             return false;
         });
-        if (!result) {
-            console.log(result);
-            console.log('알집 해제 실패: ', result);
-            return;
-        }
         await fs.remove(zipPath);
         logger(`생성 완료, 생성 경로는 ${outputDir} 입니다.`);
         if (whenFinished) {

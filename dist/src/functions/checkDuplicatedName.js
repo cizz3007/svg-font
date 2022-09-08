@@ -1,11 +1,11 @@
-import path from "path";
-import fs from "fs-extra";
+import path from 'path';
+import fs from 'fs-extra';
 const checkDuplicateName = ({ selectionPath, icons, names }, forceOverride) => {
     const iconNames = icons.map((icon, index) => {
         if (names[index]) {
             return names[index];
         }
-        return path.basename(icon).replace(path.extname(icon), "");
+        return path.basename(icon).replace(path.extname(icon), '');
     });
     const duplicates = [];
     const selection = fs.readJSONSync(selectionPath);
@@ -22,7 +22,7 @@ const checkDuplicateName = ({ selectionPath, icons, names }, forceOverride) => {
         fs.writeJSONSync(selectionPath, selection, { spaces: 2 });
     }
     else {
-        throw new Error(`Found duplicate icon names: ${duplicates.map((d) => d.name).join(",")}`);
+        throw new Error(`중복되는 이름을 찾았습니다 : ${duplicates.map((d) => d.name).join(',')}`);
     }
 };
 export { checkDuplicateName };
