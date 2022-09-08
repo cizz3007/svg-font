@@ -4,7 +4,6 @@ import pipeline from './index.js';
 import { hideBin } from 'yargs/helpers';
 
 //  --version --selection -s --icon -i 등등 받는 옵션을 설정할 수 있다.
-
 const argv = yargs(hideBin(process.argv))
     .option('s', {
         alias: 'selection',
