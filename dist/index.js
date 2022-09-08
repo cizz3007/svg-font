@@ -21,21 +21,19 @@ import { getFileRecursively } from './src/functions/getFileRecursively.js';
 function pipeline({ icons = [], names = [], selectionPath, forceOverride = false, whenFinished, visible = false, directory, outputDir: outputDirectory, }) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            console.log('directory : ', directory);
-            console.log('icons: ', icons);
-            console.log('names: ', names);
             const outputDir = outputDirectory ? getAbsolutePath(outputDirectory) : DEFAULT_OPTIONS.outputDir;
             logger('폰트 생성을 시작합니다.');
-            yield getFileRecursively(directory, (err, res) => {
+            yield getFileRecursively(directory, (err, res) => __awaiter(this, void 0, void 0, function* () {
                 if (res.length) {
                     icons = res;
                 }
-            });
+            }));
+            yield wait(100);
             if (!icons || !icons.length) {
                 if (whenFinished) {
                     whenFinished({ outputDir });
                 }
-                return logger('No new icons found.');
+                return logger('svg 파일의 이름을 매개변수로 넘겨주세요. -i "a.svg,b.svg,c.svg"');
             }
             if (!selectionPath) {
                 throw new Error('selection.json File의 경로를 정확히 입력해 주세요');
@@ -112,7 +110,7 @@ function pipeline({ icons = [], names = [], selectionPath, forceOverride = false
                     };
                 }, names);
             }
-            yield wait(1000);
+            yield wait(1200);
             yield page.reload();
             yield page.waitForSelector(PAGE.DOWNLOAD_BUTTON);
             yield page.click(PAGE.DOWNLOAD_BUTTON);
@@ -125,18 +123,14 @@ function pipeline({ icons = [], names = [], selectionPath, forceOverride = false
             yield checkDownload(zipPath);
             logger('성공적으로 다운로드 했습니다. zip파일 압축을 해제합니다.');
             yield page.close();
-            const result = yield extract(zipPath, { dir: outputDir }).catch((err) => {
+            yield extract(zipPath, { dir: outputDir }).catch((err) => {
                 console.log('zip file 에러 ', err);
                 return false;
             });
-            if (!result) {
-                console.log(result);
-                console.log('알집 해제 실패: ', result);
-                return;
-            }
             yield fs.remove(zipPath);
             logger(`생성 완료, 생성 경로는 ${outputDir} 입니다.`);
             if (whenFinished) {
+                logger('작업 완료');
                 whenFinished({ outputDir });
             }
         }

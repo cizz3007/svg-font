@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+var _a, _b, _c, _d;
 import yargs from 'yargs';
 import pipeline from './index.js';
 import { hideBin } from 'yargs/helpers';
@@ -17,13 +18,11 @@ const argv = yargs(hideBin(process.argv))
     alias: 'icons',
     describe: '불러와져야 하는 아이콘들입니다. 쉼표로 구분 나눠집니다.',
     demand: false,
-    default: '',
 })
     .option('n', {
     alias: 'names',
     describe: '아이콘 이름 바꾸기, 쉼표로 구분, 색인으로 일치\n',
     demand: false,
-    default: '',
 })
     .option('o', {
     alias: 'output',
@@ -51,8 +50,8 @@ const argv = yargs(hideBin(process.argv))
 }).argv;
 pipeline({
     selectionPath: argv.s,
-    icons: argv.i.split(','),
-    names: argv.n.split(','),
+    icons: (_b = (_a = argv.i) === null || _a === void 0 ? void 0 : _a.split(',')) !== null && _b !== void 0 ? _b : [],
+    names: (_d = (_c = argv.n) === null || _c === void 0 ? void 0 : _c.split(',')) !== null && _d !== void 0 ? _d : [],
     outputDir: argv.o,
     forceOverride: argv.f,
     visible: argv.v,

@@ -20,13 +20,11 @@ const argv = yargs(hideBin(process.argv))
         alias: 'icons',
         describe: '불러와져야 하는 아이콘들입니다. 쉼표로 구분 나눠집니다.',
         demand: false,
-        default: '',
     })
     .option('n', {
         alias: 'names',
         describe: '아이콘 이름 바꾸기, 쉼표로 구분, 색인으로 일치\n',
         demand: false,
-        default: '',
     })
     .option('o', {
         alias: 'output',
@@ -57,9 +55,9 @@ pipeline({
     // @ts-ignore
     selectionPath: argv.s,
     // @ts-ignore
-    icons: argv.i.split(','), // 넘어온 argument들을 split해서 넘김
+    icons: argv.i?.split(',') ?? [], // 넘어온 argument들을 split해서 넘김
     // @ts-ignore
-    names: argv.n.split(','), // 넘어온 argument들을 split해서 넘김
+    names: argv.n?.split(',') ?? [], // 넘어온 argument들을 split해서 넘김
     // @ts-ignore
     outputDir: argv.o,
     // @ts-ignore

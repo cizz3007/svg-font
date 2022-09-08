@@ -23,27 +23,23 @@ async function pipeline({
     outputDir: outputDirectory,
 }: Pipeline) {
     try {
-        console.log('directory : ', directory);
-        console.log('icons: ', icons);
-        console.log('names: ', names);
-
         // direcotry가 있으면 재귀로 아래에 있는 모든 svg를 icons에 대입
         const outputDir = outputDirectory ? getAbsolutePath(outputDirectory) : DEFAULT_OPTIONS.outputDir;
         // prepare stage
         logger('폰트 생성을 시작합니다.');
 
-        await getFileRecursively(directory, (err, res: string[]) => {
+        await getFileRecursively(directory, async (err, res: string[]) => {
             if (res.length) {
                 icons = res;
             }
         });
-
+        await wait(100);
         if (!icons || !icons.length) {
             // 완료 되었다면
             if (whenFinished) {
                 whenFinished({ outputDir });
             }
-            return logger('No new icons found.');
+            return logger('svg 파일의 이름을 매개변수로 넘겨주세요. -i "a.svg,b.svg,c.svg"');
         }
         if (!selectionPath) {
             throw new Error('selection.json File의 경로를 정확히 입력해 주세요');
@@ -106,7 +102,7 @@ async function pipeline({
             logger('Changed names of icons');
             // sleep to ensure indexedDB is ready
             await wait(1200);
-            await page.evaluate((names) => {
+            await page.evaluate((names: string[]) => {
                 const request = indexedDB.open('IDBWrapper-storage', 1);
                 request.onsuccess = function () {
                     const db = request.result;
@@ -134,7 +130,7 @@ async function pipeline({
         }
 
         // sleep to ensure the code was executed
-        await wait(1000);
+        await wait(1200);
         // reload the page let icomoon read latest indexedDB data
         await page.reload();
 
@@ -157,6 +153,7 @@ async function pipeline({
         await fs.remove(zipPath);
         logger(`생성 완료, 생성 경로는 ${outputDir} 입니다.`);
         if (whenFinished) {
+            logger('작업 완료');
             whenFinished({ outputDir });
         }
     } catch (error) {

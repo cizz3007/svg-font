@@ -32,7 +32,6 @@ const getFileRecursively = function (dir, done) {
                         if (file.endsWith('svg')) {
                             results.push(file);
                         }
-                        console.log('results:', results);
                         if (!--pending)
                             done(null, results);
                     }
