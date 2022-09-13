@@ -145,12 +145,20 @@ async function pipeline({
         logger('성공적으로 다운로드 했습니다. zip파일 압축을 해제합니다.');
         await page.close();
         // 알집 해체
-        await extract(zipPath, { dir: outputDir }).catch((err: any) => {
-            console.log('zip file 에러 ', err);
-            return false;
-        });
-        await fs.remove(zipPath);
-        logger(`생성 완료, 생성 경로는 ${outputDir} 입니다.`);
+        await extract(zipPath, { dir: outputDir })
+            .then(async () => {
+                await fs.remove(zipPath);
+                return true;
+            })
+            .then(() => {
+                logger(`생성 완료, 생성 경로는 ${outputDir} 입니다.`);
+                return;
+            })
+            .catch((err: any) => {
+                console.log('zip file 에러 ', err);
+                fs.remove(zipPath);
+                return;
+            });
     } catch (error) {
         console.error(error);
     }

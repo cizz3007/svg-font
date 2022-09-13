@@ -122,12 +122,20 @@ function pipeline({ icons = [], names = [], selectionPath, forceOverride = false
             yield checkDownload(zipPath);
             logger('성공적으로 다운로드 했습니다. zip파일 압축을 해제합니다.');
             yield page.close();
-            yield extract(zipPath, { dir: outputDir }).catch((err) => {
+            yield extract(zipPath, { dir: outputDir })
+                .then(() => __awaiter(this, void 0, void 0, function* () {
+                yield fs.remove(zipPath);
+                return true;
+            }))
+                .then(() => {
+                logger(`생성 완료, 생성 경로는 ${outputDir} 입니다.`);
+                return;
+            })
+                .catch((err) => {
                 console.log('zip file 에러 ', err);
-                return false;
+                fs.remove(zipPath);
+                return;
             });
-            yield fs.remove(zipPath);
-            logger(`생성 완료, 생성 경로는 ${outputDir} 입니다.`);
         }
         catch (error) {
             console.error(error);
