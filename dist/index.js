@@ -18,25 +18,24 @@ import { getAbsolutePath } from './src/functions/getAbsolutePath.js';
 import { checkDuplicateName } from './src/functions/checkDuplicatedName.js';
 import { checkDownload } from './src/functions/checkDownload.js';
 import { getFileRecursively } from './src/functions/getFileRecursively.js';
-function pipeline({ icons = [], names = [], selectionPath, forceOverride = false, whenFinished, visible = false, directory, outputDir: outputDirectory, }) {
+function pipeline({ icons = [], names = [], selectionPath, forceOverride = false, visible = false, directory, outputDir: outputDirectory, }) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const outputDir = outputDirectory ? getAbsolutePath(outputDirectory) : DEFAULT_OPTIONS.outputDir;
             logger('폰트 생성을 시작합니다.');
-            yield getFileRecursively(directory, (err, res) => __awaiter(this, void 0, void 0, function* () {
-                if (res.length) {
-                    icons = res;
-                }
-            }));
-            yield wait(100);
-            if (!icons || !icons.length) {
-                if (whenFinished) {
-                    whenFinished({ outputDir });
-                }
-                return logger('svg 파일의 이름을 매개변수로 넘겨주세요. -i "a.svg,b.svg,c.svg"');
-            }
             if (!selectionPath) {
                 throw new Error('selection.json File의 경로를 정확히 입력해 주세요');
+            }
+            if (directory) {
+                yield getFileRecursively(directory, (err, res) => __awaiter(this, void 0, void 0, function* () {
+                    if (res.length) {
+                        icons = res;
+                    }
+                }));
+                yield wait(150);
+            }
+            if (!icons || !icons.length) {
+                return logger('svg 파일의 이름을 매개변수로 넘겨주세요. -i "a.svg,b.svg,c.svg"');
             }
             let absoluteSelectionPath = getAbsolutePath(selectionPath);
             checkDuplicateName({
@@ -129,10 +128,6 @@ function pipeline({ icons = [], names = [], selectionPath, forceOverride = false
             });
             yield fs.remove(zipPath);
             logger(`생성 완료, 생성 경로는 ${outputDir} 입니다.`);
-            if (whenFinished) {
-                logger('작업 완료');
-                whenFinished({ outputDir });
-            }
         }
         catch (error) {
             console.error(error);

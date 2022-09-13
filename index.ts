@@ -17,33 +17,31 @@ async function pipeline({
     names = [],
     selectionPath,
     forceOverride = false,
-    whenFinished,
     visible = false,
     directory,
     outputDir: outputDirectory,
 }: Pipeline) {
     try {
-        // direcotry가 있으면 재귀로 아래에 있는 모든 svg를 icons에 대입
         const outputDir = outputDirectory ? getAbsolutePath(outputDirectory) : DEFAULT_OPTIONS.outputDir;
         // prepare stage
         logger('폰트 생성을 시작합니다.');
-
-        await getFileRecursively(directory, async (err, res: string[]) => {
-            if (res.length) {
-                icons = res;
-            }
-        });
-        await wait(100);
-        if (!icons || !icons.length) {
-            // 완료 되었다면
-            if (whenFinished) {
-                whenFinished({ outputDir });
-            }
-            return logger('svg 파일의 이름을 매개변수로 넘겨주세요. -i "a.svg,b.svg,c.svg"');
-        }
+        // directory 매개변수가 있으면 해당 폴더 안에 있는 모든 svg를 재귀로 찾아가며icons에 대입
         if (!selectionPath) {
             throw new Error('selection.json File의 경로를 정확히 입력해 주세요');
         }
+        if (directory) {
+            await getFileRecursively(directory, async (err, res: string[]) => {
+                if (res.length) {
+                    icons = res;
+                }
+            });
+            await wait(150);
+        }
+
+        if (!icons || !icons.length) {
+            return logger('svg 파일의 이름을 매개변수로 넘겨주세요. -i "a.svg,b.svg,c.svg"');
+        }
+
         let absoluteSelectionPath = getAbsolutePath(selectionPath);
 
         checkDuplicateName(
@@ -152,10 +150,6 @@ async function pipeline({
         });
         await fs.remove(zipPath);
         logger(`생성 완료, 생성 경로는 ${outputDir} 입니다.`);
-        if (whenFinished) {
-            logger('작업 완료');
-            whenFinished({ outputDir });
-        }
     } catch (error) {
         console.error(error);
     }
