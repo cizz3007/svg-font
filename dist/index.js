@@ -34,8 +34,8 @@ function pipeline({ icons = [], names = [], selectionPath, forceOverride = false
                 }));
                 yield wait(150);
             }
-            if (!icons || !icons.length) {
-                return logger('svg 파일의 이름을 매개변수로 넘겨주세요. -i "a.svg,b.svg,c.svg"');
+            if (!icons.length) {
+                return logger('svg 파일을 매개변수로 넘겨주세요. -i "a.svg,b.svg,c.svg"');
             }
             let absoluteSelectionPath = getAbsolutePath(selectionPath);
             checkDuplicateName({
@@ -43,7 +43,6 @@ function pipeline({ icons = [], names = [], selectionPath, forceOverride = false
                 icons,
                 names,
             }, forceOverride);
-            console.log('outputDir', outputDir);
             yield fs.remove(outputDir);
             yield fs.ensureDir(outputDir);
             const browser = yield puppeteer.launch({ headless: !visible });

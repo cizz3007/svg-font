@@ -37,8 +37,8 @@ async function pipeline({
             await wait(150);
         }
 
-        if (!icons || !icons.length) {
-            return logger('svg 파일의 이름을 매개변수로 넘겨주세요. -i "a.svg,b.svg,c.svg"');
+        if (!icons.length) {
+            return logger('svg 파일을 매개변수로 넘겨주세요. -i "a.svg,b.svg,c.svg"');
         }
 
         let absoluteSelectionPath = getAbsolutePath(selectionPath);
@@ -52,7 +52,6 @@ async function pipeline({
             forceOverride,
         );
 
-        console.log('outputDir', outputDir);
         await fs.remove(outputDir);
         await fs.ensureDir(outputDir);
 
