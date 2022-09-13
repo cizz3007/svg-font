@@ -23,7 +23,6 @@ async function pipeline({
 }: Pipeline) {
     try {
         const outputDir = outputDirectory ? getAbsolutePath(outputDirectory) : DEFAULT_OPTIONS.outputDir;
-        // prepare stage
         logger('폰트 생성을 시작합니다.');
         // directory 매개변수가 있으면 해당 폴더 안에 있는 모든 svg를 재귀로 찾아가며icons에 대입
         if (!selectionPath) {
@@ -79,12 +78,14 @@ async function pipeline({
         await page.waitForSelector(PAGE.OVERLAY_CONFIRM, { visible: true });
         await page.click(PAGE.OVERLAY_CONFIRM);
         const selection = fs.readJSONSync(selectionPath);
+
         if (selection.icons.length === 0) {
             logger('Selection icons is empty, going to create an empty set');
             await page.click(PAGE.MAIN_MENU_BUTTON);
             await page.waitForSelector(PAGE.NEW_SET_BUTTON, { visible: true });
             await page.click(PAGE.NEW_SET_BUTTON);
         }
+
         logger('Uploaded config, going to upload new icon files');
         await page.click(PAGE.MENU_BUTTON);
         const iconInput = await page.waitForSelector(PAGE.ICON_INPUT);
@@ -98,7 +99,7 @@ async function pipeline({
         await page.waitForSelector(PAGE.GLYPH_SET);
         if (names.length) {
             logger('Changed names of icons');
-            // sleep to ensure indexedDB is ready
+            // indexedDB가 확실히 준비될 때까지 기다림
             await wait(1200);
             await page.evaluate((names: string[]) => {
                 const request = indexedDB.open('IDBWrapper-storage', 1);
@@ -127,9 +128,9 @@ async function pipeline({
             }, names);
         }
 
-        // sleep to ensure the code was executed
+        // 코드가 확실하게 실행되었을 시간까지 기다림
         await wait(1200);
-        // reload the page let icomoon read latest indexedDB data
+        // icomoon이 최신 indexedDB를 읽을 수 있게 리로드함.
         await page.reload();
 
         await page.waitForSelector(PAGE.DOWNLOAD_BUTTON);
